@@ -6,7 +6,8 @@ export const Rol = sequelize.define(
     {
         id:{
             primaryKey: true,
-            type:DataTypes.INTEGER
+            type:DataTypes.INTEGER,
+            autoIncrement: true
         },
         nombre:{
             type:DataTypes.STRING

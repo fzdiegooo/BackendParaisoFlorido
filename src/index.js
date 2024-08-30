@@ -1,6 +1,7 @@
 import express from "express";
 import { configDotenv } from "dotenv";
 import alumnosRouter from "./routes/alumnos.routes.js";
+import asistenciaRouter from "./routes/asistencia.routes.js";
 import { sequelize } from "./database/database.js";
 import "./models/Usuario.js"
 import "./models/Asistencias.js"
@@ -26,3 +27,4 @@ async function main(){
 main();
 
 app.use("/api", alumnosRouter)
+app.use("/api", asistenciaRouter)
