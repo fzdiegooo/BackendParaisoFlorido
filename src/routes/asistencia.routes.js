@@ -1,17 +1,7 @@
 import { Router } from "express";
-import { emailHelper } from "../utils/sendEmail.js";
+import { registro } from "../controllers/asistencia.controller.js";
 const router = Router();
 
-router.post("/asistencia",(req,res)=>{
-    const { to, subject, text } = req.body;
-    try {
-        emailHelper(to,subject,text);
-        
-    } catch (error) {
-        console.log(error);
-        
-    }
-
-})
+router.post("/asistencia", registro)
 
 export default router

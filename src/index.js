@@ -15,7 +15,7 @@ app.use(express.json())
 
 async function main(){
     try {
-        await sequelize.sync({force: true})
+        await sequelize.sync({alter: true})
         app.listen(process.env.PORT,()=>{
             console.log(`Servidor corriendo en el puerto ${process.env.PORT}`);
         })

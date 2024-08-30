@@ -10,13 +10,13 @@ export const Asistencias = sequelize.define(
             defaultValue: DataTypes.UUIDV4
         },
         fecha:{
-            type:DataTypes.DATE
+            type:DataTypes.STRING
         },
         ingreso:{
-            type: DataTypes.TIME
+            type: DataTypes.STRING
         },
         salida:{
-            type: DataTypes.TIME
+            type: DataTypes.STRING
         }
 
     },
