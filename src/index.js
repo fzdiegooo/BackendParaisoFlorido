@@ -2,7 +2,11 @@ import express from "express";
 import { configDotenv } from "dotenv";
 import alumnosRouter from "./routes/alumnos.routes.js";
 import { sequelize } from "./database/database.js";
-import "./models/Alumno.js"
+import "./models/Usuario.js"
+import "./models/Asistencias.js"
+import "./models/Grados.js"
+import "./models/Roles.js"
+import "./models/Secciones.js"
 const app = express()
 configDotenv()
 app.use(express.json())
