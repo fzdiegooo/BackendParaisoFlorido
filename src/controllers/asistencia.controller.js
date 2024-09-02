@@ -1,6 +1,21 @@
 import { Usuario } from "../models/Usuario.js";
 import { Asistencias } from "../models/Asistencias.js";
 
+
+export const getAsistencia = async(req, res)=>{
+    try{
+        const listaAsistencia = await Asistencias.findAll({include:[{
+            model: Usuario,
+            attributes:["nombre"]
+        }]});
+        res.send(listaAsistencia)
+    }catch(error){
+        console.log(error);
+    }
+}
+
+
+
 export const registro = async (req, res) => {
     const { id } = req.body;
 
@@ -16,12 +31,16 @@ export const registro = async (req, res) => {
                 fecha: fechaActual
             }
         });
-
-        if (asistencia) {
-            await asistencia.update({
-                salida: new Date().toLocaleTimeString("es-PE")
-            });
-            return res.status(200).json({ message: "Registro de salida exitoso" });
+        if (asistencia ) {
+            if(new Date() - new Date(`${fechaActual}T${asistencia.ingreso}`) >= 15 * 60 * 1000){
+                await asistencia.update({
+                    salida: new Date().toLocaleTimeString("es-PE")
+                });
+                return res.status(200).json({ message: "Registro de salida exitoso" });
+            }else{
+                return res.status(400).json({ message: "No se puede registrar una asistencia si almenos no pasan 15 min" });
+            }
+            
         } else {
             await Asistencias.create({
                 fecha: fechaActual,
@@ -37,3 +56,6 @@ export const registro = async (req, res) => {
         return res.status(500).json({ message: "Error interno del servidor" });
     }
 }
+
+
+

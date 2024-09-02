@@ -4,6 +4,7 @@ import { Grados } from "./Grados.js";
 import { Secciones } from "./Secciones.js";
 import { Asistencias } from "./Asistencias.js";
 import { Rol } from "./Roles.js";
+import bcrypt from "bcryptjs";
 
 export const Usuario = sequelize.define(
     "Usuario",
@@ -16,11 +17,10 @@ export const Usuario = sequelize.define(
         nombre:{
             type:DataTypes.STRING
         },
-        apellido:{
-            type:DataTypes.STRING
-        },
         documento:{
-            type: DataTypes.STRING(12)
+            type: DataTypes.STRING(12),
+            unique: true,
+            allowNull: true
         },
         sexo:{
             type:DataTypes.STRING
@@ -29,16 +29,30 @@ export const Usuario = sequelize.define(
             type:DataTypes.INTEGER
         },
         correo:{
-            type:DataTypes.STRING
+            type:DataTypes.STRING,
+            unique: true,
+            allowNull: true
         },
         password:{
             type:DataTypes.STRING
         }
     },
     {
-        timestamps:false
+        timestamps:false,
+        hooks:{
+            beforeCreate: async(usuario, options)=>{
+                const salt = await bcrypt.genSalt(10);
+                usuario.password = await bcrypt.hash(usuario.password, salt); 
+            }
+        }
     }
+
 )
+
+Usuario.comparePassword = async(password, hashPassword)=>{
+    return await bcrypt.compare(password,hashPassword)
+}
+
 //  TIPO DE DOCUMENTO | NÚMERO DE DOCUMENTO | VALIDADO CON RENIEC | CÓDIGO DEL ESTUDIANTE | APELLIDO PATERNO | APELLIDO MATERNO | NOMBRES | SEXO | FECHA DE NACIMIENTO | EDAD (AL 31 DE MARZO) | ESTADO DE MATRICULA | TIPO DE VACANTE
 
 //realacion uno a muchos Grado
