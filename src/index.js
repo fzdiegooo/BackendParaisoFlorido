@@ -1,4 +1,5 @@
 import express from "express";
+import cors from "cors"
 import { configDotenv } from "dotenv";
 import alumnosRouter from "./routes/alumnos.routes.js";
 import asistenciaRouter from "./routes/asistencia.routes.js";
@@ -11,6 +12,7 @@ import "./models/Roles.js"
 import "./models/Secciones.js"
 const app = express()
 configDotenv()
+app.use(cors())
 app.use(express.json())
 
 
@@ -27,6 +29,6 @@ async function main(){
 
 main();
 
-app.use("/api/Usuarios", alumnosRouter)
-app.use("/api/Asistencia", asistenciaRouter)
+app.use("/api", alumnosRouter)
+app.use("/api", asistenciaRouter)
 app.use("/api/auth", authRouter)

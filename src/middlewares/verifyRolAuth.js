@@ -1,49 +1,23 @@
 import { Usuario } from "../models/Usuario.js";
-import { Op } from "sequelize";
+import { Rol } from "../models/Roles.js";
+import jwt from "jsonwebtoken";
 
-export const VerifyUsuarioAuthorize = async (req, res, next) => {
-    const { token } = req.headers["x-access-token"];
-    try {  
-        const id = verifyToken(token);
-        const usuario = await Usuario.findOne(
-            {
-                where:{
-                    id,
-                    RolId: { 
-                        [Op.ne]: 1  
-                      }
-                }
-            }
-        )
-        if(usuario) next();
-    } catch (error) {
-          return res.status(400).json({ errorMessage:error });
-    }
+export const verifyToken = async (req, res, next) => {
+  try {
+    const token = req.headers["x-access-token"];
+    const decoded = jwt.verify(token, process.env.SECRETKEY);
+    req.userId = decoded.id 
+    const usuario = await Usuario.findOne({
+      where: { id: req.userId },
+      include: Rol,
+    });
+    console.log(usuario);
+    
+    if (!usuario) return res.status(404).json({ message: "Usuario no encontrado" });
+    next();
+  } catch (error) {
+    return res.status(400).json({ errorMessage: error });
+  }
 };
-export const VerifyUsuarioNormal = async (req, res, next) => {
-    const { token } = req.headers["x-access-token"];
-    try {  
-        const id = verifyToken(token);
-        const usuario = await Usuario.findOne(
-            {
-                where:{
-                    id
-                }
-            }
-        )
-        if(usuario) next();
-    } catch (error) {
-          return res.status(400).json({ errorMessage:error });
-    }
-};
-function verifyToken(token){
-    const decoded = jwt.verify(token,process.env.SECRETKEY);
-    return decoded.id;
-}
-
-
-
-
-
 
 

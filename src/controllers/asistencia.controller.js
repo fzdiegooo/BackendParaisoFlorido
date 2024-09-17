@@ -1,5 +1,7 @@
 import { Usuario } from "../models/Usuario.js";
 import { Asistencias } from "../models/Asistencias.js";
+import moment from "moment/moment.js";
+
 
 
 export const getAsistencia = async(req, res)=>{
@@ -20,17 +22,17 @@ export const registro = async (req, res) => {
     const { id } = req.body;
 
     try {
+        //Busqueda usuario
         const usuarioEncontrado = await Usuario.findOne({ where: { id: id } });
         if (!usuarioEncontrado) return res.status(404).json({ message: "Alumno no encontrado" });
 
-        const fechaActual = new Date().toISOString().split('T')[0];
+        const fechaActual = moment().format('YYYY-MM-DD');
+        const horaActual = moment().format('HH:mm:ss')
 
         const asistencia = await Asistencias.findOne({
-            where: {
-                usuarioId: id,
-                fecha: fechaActual
-            }
+            where: {usuarioId: id, fecha: fechaActual}
         });
+
         if (asistencia ) {
             if(new Date() - new Date(`${fechaActual}T${asistencia.ingreso}`) >= 15 * 60 * 1000){
                 await asistencia.update({

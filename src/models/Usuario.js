@@ -19,7 +19,7 @@ export const Usuario = sequelize.define(
         },
         documento:{
             type: DataTypes.STRING(12),
-            unique: true,
+            unique: 'documento',
             allowNull: true
         },
         sexo:{
@@ -30,7 +30,7 @@ export const Usuario = sequelize.define(
         },
         correo:{
             type:DataTypes.STRING,
-            unique: true,
+            unique: 'correo',
             allowNull: true
         },
         password:{
@@ -56,12 +56,12 @@ Usuario.comparePassword = async(password, hashPassword)=>{
 //  TIPO DE DOCUMENTO | NÚMERO DE DOCUMENTO | VALIDADO CON RENIEC | CÓDIGO DEL ESTUDIANTE | APELLIDO PATERNO | APELLIDO MATERNO | NOMBRES | SEXO | FECHA DE NACIMIENTO | EDAD (AL 31 DE MARZO) | ESTADO DE MATRICULA | TIPO DE VACANTE
 
 //realacion uno a muchos Grado
-Grados.hasMany(Usuario);
-Usuario.belongsTo(Grados);
+Grados.hasMany(Usuario,{foreignKey: 'gradoId', as: 'grado'});
+Usuario.belongsTo(Grados, { foreignKey: 'gradoId', as: 'grado' });
 
 //realacion uno a muchos Grado
-Secciones.hasMany(Usuario);
-Usuario.belongsTo(Secciones);
+Secciones.hasMany(Usuario,{foreignKey: 'seccionId',as: "seccion"});
+Usuario.belongsTo(Secciones,{foreignKey: 'seccionId',as: "seccion"});
 
 Rol.hasMany(Usuario);
 Usuario.belongsTo(Rol);
