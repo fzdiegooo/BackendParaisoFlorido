@@ -67,7 +67,10 @@ export const registro = async (req, res) => {
 
         if (asistencia) {
             // Calcular la diferencia en minutos desde el ingreso hasta el momento actual
-            const diferenciaMinutos = moment().diff(moment(`${fechaActual} ${asistencia.ingreso}`, 'DD-MM-YYYY hh:mm A'), 'minutes');
+            const diferenciaMinutos = horaActual.diff(
+              moment.tz(`${fechaActual} ${asistencia.ingreso}`, 'DD-MM-YYYY hh:mm A', "America/Lima"),
+              'minutes'
+          );
 
             if(asistencia.fecha == fechaActual && asistencia.salida != null) return res.status(500).json({message: "Ya existe este registro"})
 
