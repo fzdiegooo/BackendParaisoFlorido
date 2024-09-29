@@ -59,7 +59,7 @@ export const registro = async (req, res) => {
         if (!usuarioEncontrado) return res.status(404).json({ message: "Alumno no encontrado" });
 
         const fechaActual = moment().format('DD-MM-YYYY');
-        const horaActual = moment()
+        const horaActual = moment().tz("America/Lima")
 
         const asistencia = await Asistencias.findOne({
             where: {usuarioId: id, fecha: fechaActual}
@@ -75,7 +75,7 @@ export const registro = async (req, res) => {
             if (diferenciaMinutos >= 2) {
                 // Actualizar el registro de salida
                 await asistencia.update({
-                    salida: horaActual.format('hh:mm A')
+                    salida: horaActual.tz("America/Lima").format('hh:mm A')
                 });
                 return res.status(200).json({ message: "Registro de salida exitoso" });
             } else {
@@ -85,7 +85,7 @@ export const registro = async (req, res) => {
             // Crear nuevo registro de ingreso
             await Asistencias.create({
                 fecha: fechaActual,
-                ingreso: horaActual.format('hh:mm A'),
+                ingreso: horaActual.tz("America/Lima").format('hh:mm A'),
                 salida: null,
                 usuarioId: id
             });
