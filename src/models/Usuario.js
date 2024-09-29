@@ -17,6 +17,9 @@ export const Usuario = sequelize.define(
         nombre:{
             type:DataTypes.STRING
         },
+        apellido:{
+            type:DataTypes.STRING
+        },
         documento:{
             type: DataTypes.STRING(12),
             unique: 'documento',

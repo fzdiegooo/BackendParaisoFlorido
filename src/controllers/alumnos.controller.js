@@ -3,7 +3,7 @@ import { Grados } from "../models/Grados.js";
 import { Secciones } from "../models/Secciones.js";
 
 export const alumnosFiltros = async (req, res)=>{
-    const { nombre, grado, seccion, alf = 'ASC'} = req.query;
+    const { apellido, grado, seccion, alf = 'ASC'} = req.query;
     //const alumnos = await Usuario.findAll({where:{RolId: 1}})
 
     let alumnos = await Usuario.findAll({where:{
@@ -25,11 +25,11 @@ export const alumnosFiltros = async (req, res)=>{
         
         ['GradoId', 'ASC'],       
         ['SeccionId', 'ASC'],
-        ['nombre', alf],  
+        ['apellido', alf],  
     ]
 })
-    if(nombre){
-        alumnos = alumnos.filter(alumno => alumno.nombre === nombre)
+    if(apellido){
+        alumnos = alumnos.filter(alumno => alumno.apellido === apellido)
     }
 
     if(grado){

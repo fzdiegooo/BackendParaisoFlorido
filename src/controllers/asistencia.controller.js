@@ -2,20 +2,51 @@ import { Usuario } from "../models/Usuario.js";
 import { Asistencias } from "../models/Asistencias.js";
 import moment from "moment/moment.js";
 import 'moment/locale/es.js';
+import { Secciones } from "../models/Secciones.js";
 
 
 
-export const getAsistencia = async(req, res)=>{
-    try{
-        const listaAsistencia = await Asistencias.findAll({include:[{
+export const getAsistencia = async (req, res) => {
+    try {
+      const { fecha } = req.query; // Fecha que se recibe desde la consulta
+      let listaAsistencia = await Asistencias.findAll({
+        include: [
+          {
             model: Usuario,
-            attributes:["nombre"]
-        }]});
-        res.send(listaAsistencia)
-    }catch(error){
-        console.log(error);
+            include: [{ model: Secciones, as: "seccion" }],
+          },
+        ],
+      });
+  
+      if (fecha) {
+        console.log(fecha);
+  
+        listaAsistencia = listaAsistencia.filter((asistencia) => {
+          const fechaAsistencia = moment(asistencia.fecha, 'DD-MM-YYYY').format('DD/MM/YYYY'); 
+          const fechaQuery = moment(fecha, 'YYYY-MM-DD').format('DD/MM/YYYY');
+          return fechaAsistencia === fechaQuery;
+        });
+      }
+  
+      // Mapear la respuesta para devolver solo los campos necesarios
+      const respuesta = listaAsistencia.map((asistencia) => ({
+        id: asistencia.id,
+        fecha: asistencia.fecha, // Formatear fecha antes de enviar
+        ingreso: asistencia.ingreso,
+        salida: asistencia.salida,
+        nombreAlumno: asistencia.Usuario.nombre,
+        apellidoAlumno: asistencia.Usuario.apellido,
+        gradoId: asistencia.Usuario.gradoId,
+        nombreSeccion: asistencia.Usuario.seccion.nombre,
+      }));
+  
+      // Enviar la respuesta personalizada
+      res.json(respuesta);
+    } catch (error) {
+      console.error("Error al obtener la lista de asistencias:", error);
+      res.status(500).json({ message: "Error interno del servidor" });
     }
-}
+  };
 
 
 
@@ -27,8 +58,8 @@ export const registro = async (req, res) => {
         const usuarioEncontrado = await Usuario.findOne({ where: { id: id } });
         if (!usuarioEncontrado) return res.status(404).json({ message: "Alumno no encontrado" });
 
-        const fechaActual = moment().format('YYYY-MM-DD');
-        const horaActual = moment().format('HH:mm:ss')
+        const fechaActual = moment().format('DD-MM-YYYY');
+        const horaActual = moment()
 
         const asistencia = await Asistencias.findOne({
             where: {usuarioId: id, fecha: fechaActual}
@@ -36,13 +67,15 @@ export const registro = async (req, res) => {
 
         if (asistencia) {
             // Calcular la diferencia en minutos desde el ingreso hasta el momento actual
-            const diferenciaMinutos = moment().diff(moment(`${fechaActual} ${asistencia.ingreso}`), 'minutes');
+            const diferenciaMinutos = moment().diff(moment(`${fechaActual} ${asistencia.ingreso}`, 'DD-MM-YYYY hh:mm A'), 'minutes');
+
+            if(asistencia.fecha == fechaActual && asistencia.salida != null) return res.status(500).json({message: "Ya existe este registro"})
 
             // Verificar si han pasado más de 15 minutos desde el registro de ingreso
-            if (diferenciaMinutos >= 15) {
+            if (diferenciaMinutos >= 2) {
                 // Actualizar el registro de salida
                 await asistencia.update({
-                    salida: horaActual
+                    salida: horaActual.format('hh:mm A')
                 });
                 return res.status(200).json({ message: "Registro de salida exitoso" });
             } else {
@@ -52,7 +85,7 @@ export const registro = async (req, res) => {
             // Crear nuevo registro de ingreso
             await Asistencias.create({
                 fecha: fechaActual,
-                ingreso: horaActual,
+                ingreso: horaActual.format('hh:mm A'),
                 salida: null,
                 usuarioId: id
             });
