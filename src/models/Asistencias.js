@@ -1,6 +1,5 @@
 import { DataTypes } from "sequelize";
 import { sequelize } from "../database/database.js";
-import { Usuario } from "./Usuario.js";
 export const Asistencias = sequelize.define(
     "Asistencias",
     {
@@ -16,6 +15,9 @@ export const Asistencias = sequelize.define(
             type: DataTypes.STRING
         },
         salida:{
+            type: DataTypes.STRING
+        },
+        estado:{
             type: DataTypes.STRING
         }
 
