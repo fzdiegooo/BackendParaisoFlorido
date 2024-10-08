@@ -1,6 +1,5 @@
 import { Usuario } from "../models/Usuario.js";
 import { Rol } from "../models/Roles.js";
-import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
 export const login = async (req, res) => {
@@ -27,13 +26,14 @@ export const login = async (req, res) => {
 };
 
 export const register = async (req, res) => {
-  const { nombre, documento, sexo, edad, correo, password, rol } = req.body;
+  const { nombre, apellido, documento, sexo, edad, correo, password, rol } = req.body;
   try {
     const Rol_Encontrado = await Rol.findOne({ where: { nombre: rol } });
     console.log(Rol_Encontrado.id);
 
     const respuesta = await Usuario.create({
       nombre,
+      apellido,
       documento,
       sexo,
       edad,

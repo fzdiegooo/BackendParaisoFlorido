@@ -3,6 +3,12 @@ import { Asistencias } from "../models/Asistencias.js";
 import moment from "moment/moment.js";
 import "moment/locale/es.js";
 import { Secciones } from "../models/Secciones.js";
+import  {Resend}  from 'resend';
+import dotenv from 'dotenv';
+
+dotenv.config();
+
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 export const getAsistencia = async (req, res) => {
   try {
@@ -59,6 +65,8 @@ export const registro = async (req, res) => {
 
     const fechaActual = moment().format("DD-MM-YYYY");
     const horaActual = moment().tz("America/Lima");
+    const nombreCompleto = `${usuarioEncontrado.nombre+" "+usuarioEncontrado.apellido}`
+    const hora = `${horaActual.tz("America/Lima").format("hh:mm A")}`
 
     const asistencia = await Asistencias.findOne({
       where: { usuarioId: id, fecha: fechaActual },
@@ -84,13 +92,26 @@ export const registro = async (req, res) => {
         await asistencia.update({
           salida: horaActual.tz("America/Lima").format("hh:mm A"),
         });
+
+        let estado = "salio del colegio"
+
+        res.render('email-template',{nombreCompleto, estado, hora},async (err,html)=>{
+          if(err) return res.status(500).send('Error al enviar el correo.');
+
+          const data = await resend.emails.send({
+            from: 'Colegio Paraiso Florido <paraisoflorido@diegobulnesruiz.lat>',
+            to: `${usuarioEncontrado.correo}`,
+            subject: 'Asistencia',
+            html: html
+          });
+          console.log(data);
+
+        })
+
         return res.status(200).json({ message: "Registro de salida exitoso" });
       } else {
-        return res
-          .status(422)
-          .json({
-            message: "Deben pasar al menos 15 minutos para registrar la salida",
-          });
+
+        return res.status(422).json({message: "Deben pasar al menos 15 minutos para registrar la salida",});
       }
     } else {
       // Crear nuevo registro de ingreso
@@ -100,6 +121,22 @@ export const registro = async (req, res) => {
         salida: null,
         usuarioId: id,
       });
+
+      let estado = "ingreso al colegio"
+
+      res.render('email-template',{nombreCompleto, estado, hora}, async(err,html)=>{
+        if(err) return res.status(500).send('Error al enviar el correo.'+err);
+
+        const data = await resend.emails.send({
+          from: 'Colegio Paraiso Florido <paraisoflorido@diegobulnesruiz.lat>',
+          to: `${usuarioEncontrado.correo}`,
+          subject: 'Asistencia',
+          html: html
+        });
+        console.log(data);
+
+      })
+
       return res.status(201).json({ message: "Registro de ingreso exitoso" });
     }
   } catch (error) {
@@ -107,3 +144,5 @@ export const registro = async (req, res) => {
     return res.status(500).json({ message: "Error interno del servidor" });
   }
 };
+
+

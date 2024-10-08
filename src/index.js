@@ -1,5 +1,7 @@
 import express from "express";
-import cors from "cors"
+import cors from "cors";
+import path from 'path';
+import { fileURLToPath } from 'url';
 import { configDotenv } from "dotenv";
 import alumnosRouter from "./routes/alumnos.routes.js";
 import asistenciaRouter from "./routes/asistencia.routes.js";
@@ -14,7 +16,11 @@ const app = express()
 configDotenv()
 app.use(cors())
 app.use(express.json())
-
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+app.set('view engine', 'ejs');
+// Configuración de vistas
+app.set('views', path.join(__dirname, 'views'));
 
 async function main(){
     try {
