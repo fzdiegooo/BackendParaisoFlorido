@@ -26,45 +26,37 @@ export const login = async (req, res) => {
 };
 
 export const register = async (req, res) => {
-  const { nombre, apellido, documento, sexo, edad, correo, password, rol } = req.body;
+  const { nombre, apellido, documento, sexo, edad, correo, password, rol, grado, seccion, telefono, turno } = req.body;
   try {
     const Rol_Encontrado = await Rol.findOne({ where: { nombre: rol } });
     console.log(Rol_Encontrado.id);
-
-    const respuesta = await Usuario.create({
-      nombre,
-      apellido,
-      documento,
-      sexo,
-      edad,
-      correo,
-      password,
-      RolId: Rol_Encontrado.id,
-    });
-
-    const token = jwt.sign({  id: respuesta.id  },  process.env.SECRETKEY,  {
-      expiresIn: 86400,
-    });
-
-    return res.status(200).json({ token:  token, usuario: respuesta  });
+    try {
+      const respuesta = await Usuario.create({
+        nombre,
+        apellido,
+        documento,
+        sexo,
+        edad,
+        correo,
+        password,
+        telefono,
+        turno,
+        RolId: Rol_Encontrado.id,
+        gradoId: grado,
+        seccionId: seccion
+        
+      });
+      const token = jwt.sign({  id: respuesta.id  },  process.env.SECRETKEY,  {
+        expiresIn: 86400,
+      });
+  
+      return res.status(200).json({ token:  token, usuario: respuesta  });
+    } catch (error) {
+      console.log(error);
+    }
+    
   } catch (error) {
     return res.status(400).json({ ErrorMessage: error });
   }
 };
 
-export const validate = async (req,res)=>{
-    const {token} = req.headers;
-    try {
-        const decoded = jwt.verify(token,process.env.SECRETKEY);
-
-        const usuario = await Usuario.findOne({where:{id:decoded.id}, include:Rol});
-        if(!usuario) return res.status(200).json({error:"USUARIO NO ENCONTRADO"});
-        return res.status(200).json({
-            usuario
-        });
-    } catch (error) {
-        
-    }
-    
-    
-}

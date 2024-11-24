@@ -8,8 +8,6 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-const resend = new Resend(process.env.RESEND_API_KEY);
-
 export const getAsistencia = async (req, res) => {
   try {
     const { fecha } = req.query; // Fecha que se recibe desde la consulta

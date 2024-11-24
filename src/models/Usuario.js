@@ -23,7 +23,6 @@ export const Usuario = sequelize.define(
         documento:{
             type: DataTypes.STRING(12),
             unique: 'documento',
-            allowNull: true
         },
         sexo:{
             type:DataTypes.STRING
@@ -34,18 +33,27 @@ export const Usuario = sequelize.define(
         correo:{
             type:DataTypes.STRING,
             unique: 'correo',
-            allowNull: true
         },
         password:{
             type:DataTypes.STRING
+        },
+        telefono:{
+            type:DataTypes.STRING,
+            allowNull: true
+        },
+        turno:{
+            type:DataTypes.STRING,
+            allowNull: true
         }
     },
     {
         timestamps:false,
         hooks:{
             beforeCreate: async(usuario, options)=>{
-                const salt = await bcrypt.genSalt(10);
-                usuario.password = await bcrypt.hash(usuario.password, salt); 
+                if(usuario.password){
+                    const salt = await bcrypt.genSalt(10);
+                    usuario.password = await bcrypt.hash(usuario.password, salt); 
+                } 
             }
         }
     }

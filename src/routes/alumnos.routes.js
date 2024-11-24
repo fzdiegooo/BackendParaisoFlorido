@@ -4,7 +4,6 @@ import { alumnosAsistencias, alumnosFiltros } from "../controllers/alumnos.contr
 const router = Router()
 
 router.get("/alumnos", alumnosFiltros)
-
 router.get("/alumnos/:id", alumnosAsistencias)
 
 export default router;

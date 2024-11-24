@@ -6,6 +6,7 @@ import { configDotenv } from "dotenv";
 import alumnosRouter from "./routes/alumnos.routes.js";
 import asistenciaRouter from "./routes/asistencia.routes.js";
 import authRouter from "./routes/auth.routes.js";
+import userRouter from "./routes/user.routes.js";
 import { sequelize } from "./database/database.js";
 import "./models/Usuario.js"
 import "./models/Asistencias.js"
@@ -36,5 +37,6 @@ async function main(){
 main();
 
 app.use("/api", alumnosRouter)
+app.use("/api", userRouter)
 app.use("/api", asistenciaRouter)
 app.use("/api/auth", authRouter)
